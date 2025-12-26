@@ -1,0 +1,16 @@
+app/Models/Guru.java
+app/Models/Biodata.java
+app/Models/Admin.java
+app/Models/Absensi.java
+app/Models/Siswa.java
+app/Models/Nilai.java
+app/Models/AuthModel.java
+app/Models/Users.java
+app/App/Helper.java
+app/App/Controller.java
+app/App/Database.java
+app/Controllers/AdminController.java
+app/Controllers/HomeController.java
+app/Controllers/GuruController.java
+app/Controllers/SiswaController.java
+Main.java
