@@ -1,14 +1,55 @@
 package app.Models;
 
 import app.App.Database;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Users extends Database {
 
-    public int createNewUser(String nama, int id_role) {
+    public static class userdata {
+
+        private int id_user;
+        private String nama;
+        private String pass;
+        private int id_role;
+
+        // Getter dan Setter sebagai pintu akses data (Encapsulation)
+        public int getId_user() {
+            return id_user;
+        }
+
+        public void setId_user(int id_user) {
+            this.id_user = id_user;
+        }
+
+        public void setId_role(int id_role) {
+            this.id_role = id_role;
+        }
+
+        public int getId_role() {
+            return id_role;
+        }
+
+        public String getNama() {
+            return nama;
+        }
+
+        public void setNama(String nama) {
+            this.nama = nama;
+        }
+
+        public String getPass() {
+            return pass;
+        }
+
+        public void setPass(String pass) {
+            this.pass = pass;
+        }
+
+    }
+
+    public int createNewUser(userdata dto) {
         // 1. Definisikan SQL (Password otomatis default '1234')
         String sql = "INSERT INTO users (nama, pass, id_role) VALUES (?, '1234', ?)";
 
@@ -16,8 +57,8 @@ public class Users extends Database {
             // 2. Tambahkan flag RETURN_GENERATED_KEYS agar JDBC menangkap ID baru
             var stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
 
-            stmt.setString(1, nama);
-            stmt.setInt(2, id_role);
+            stmt.setString(1, dto.getNama());
+            stmt.setInt(2, dto.getId_role());
 
             // 3. Jalankan perintah insert
             int affectedRows = stmt.executeUpdate();
@@ -61,14 +102,14 @@ public class Users extends Database {
     // }
     // public ResultSet ReadUser() {
     // }
-    public boolean UpdateUser(int id_user, String password) {
+    public boolean UpdateUser(userdata dto) {
 
         String sql = "UPDATE users SET pass = ? WHERE id_user = ?";
 
         try {
             var stmt = prepare(sql);
-            stmt.setString(1, password);
-            stmt.setInt(2, id_user);
+            stmt.setString(1, dto.getPass());
+            stmt.setInt(2, dto.getId_user());
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -93,13 +134,13 @@ public class Users extends Database {
 
     }
 
-    public boolean DeleteUser(int id_user) {
+    public boolean DeleteUser(userdata dto) {
 
         String sql = "DELETE FROM users WHERE id_user = ?";
 
         try {
             var stmt = prepare(sql);
-            stmt.setInt(1, id_user);
+            stmt.setInt(1, dto.getId_user());
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -111,13 +152,13 @@ public class Users extends Database {
 
     }
 
-    public ResultSet ValidasiSiswa(String nama, String password) {
+    public ResultSet ValidasiSiswa(userdata dto) {
 
         String sql = "SELECT * FROM users WHERE nama = ? AND pass = ?";
         try {
             var stmt = prepare(sql);
-            stmt.setString(1, nama);
-            stmt.setString(2, password);
+            stmt.setString(1, dto.getNama());
+            stmt.setString(2, dto.getPass());
 
             return stmt.executeQuery();
 
@@ -138,6 +179,19 @@ public class Users extends Database {
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public boolean ValidasiIdUsers(userdata dto) {
+        String sql = "SELECT * FROM users WHERE id_user = ?";
+        try {
+            var stmt = prepare(sql);
+            stmt.setInt(1, dto.getId_user());
+            var rs = stmt.executeQuery();
+            return rs.next(); // Mengembalikan true jika ada data
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

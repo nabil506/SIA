@@ -336,7 +336,6 @@ public class AdminController extends HomeController {
         }
     }
 
-    // controller untuk guru
     public void InputDataGuru() {
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║                PENDAFTARAN BIODATA GURU BARU                 ║");
@@ -662,14 +661,17 @@ public class AdminController extends HomeController {
         System.out.printf("│ %-8d │ %-49s │%n", 2, "SISWA (Akses Lihat Biodata & Nilai)");
         System.out.println("└──────────┴───────────────────────────────────────────────────┘");
 
+        Users.userdata dto = new Users.userdata();
         // 2. Proses Input Data
         System.out.println("\n--- Masukkan Informasi Akun Baru ---");
         System.out.print("➤ Nama Lengkap   : ");
         String nama = input.nextLine();
+        dto.setNama(nama);
 
         System.out.print("➤ ID Role (1/2)  : ");
         int id_role = input.nextInt();
         input.nextLine(); // Membersihkan buffer enter
+        dto.setId_role(id_role);
 
         // Validasi input role secara lokal sebelum kirim ke model
         if (id_role != 1 && id_role != 2) {
@@ -680,7 +682,7 @@ public class AdminController extends HomeController {
         }
 
         // 3. Eksekusi ke Model
-        int isCreateUser = this.usersModel.createNewUser(nama, id_role);
+        int isCreateUser = this.usersModel.createNewUser(dto);
 
         // 4. Tampilkan Status Berhasil/Gagal
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
@@ -692,8 +694,8 @@ public class AdminController extends HomeController {
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
     }
 
-public void UpdateUser() {
-   System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
+    public void UpdateUser() {
+        System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║                     UPDATE USER PASSWORD                     ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
@@ -702,22 +704,30 @@ public void UpdateUser() {
             System.out.println("╔══════════╦══════════════════════════════╦════════════════════╗");
             System.out.printf("║ %-8s ║ %-28s ║ %-18s ║%n", "ID USER", "NAMA LENGKAP", "ROLE");
             System.out.println("╠══════════╬══════════════════════════════╬════════════════════╣");
-            
+
             while (listRs != null && listRs.next()) {
                 int idUserDB = listRs.getInt("id_user");
                 int roleID = listRs.getInt("id_role");
 
                 // FILTER: Jangan tampilkan admin yang sedang login
-                if (idUserDB == HomeController.session_id_user) continue; 
+                if (idUserDB == HomeController.session_id_user) {
+                    continue;
+                }
 
                 String roleName = (roleID == 1) ? "Guru" : (roleID == 2) ? "Siswa" : "Admin";
                 System.out.printf("║ %-8d ║ %-28s ║ %-18s ║%n", idUserDB, listRs.getString("nama"), roleName);
             }
             System.out.println("╚══════════╩══════════════════════════════╩════════════════════╝");
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Users.userdata dto = new Users.userdata();
 
         System.out.print("\n➤ Masukkan ID User yang akan diupdate: ");
-        int id_user = input.nextInt(); input.nextLine();
+        int id_user = input.nextInt();
+        input.nextLine();
+        dto.setId_user(id_user);
 
         // VALIDASI: Cegah input ID admin yang sedang login secara manual
         if (id_user == HomeController.session_id_user) {
@@ -728,65 +738,84 @@ public void UpdateUser() {
         System.out.print("➤ Masukkan Password Baru: ");
         String password = input.nextLine();
 
-        if (this.usersModel.UpdateUser(id_user, password)) {
+        dto.setPass(password);
+
+        if (this.usersModel.UpdateUser(dto)) {
             System.out.println(">> SUCCESS: Password berhasil diperbarui!");
         } else {
             System.out.println(">> FAILED: Gagal update password.");
         }
-}
-public void DeleteUser() {
-    System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-    System.out.println("║                       DELETE USER                            ║");
-    System.out.println("╚══════════════════════════════════════════════════════════════╝");
-
-    // 1. Tampilkan Daftar User agar Admin tidak salah hapus ID
-    try {
-        ResultSet listRs = this.usersModel.User();
-        System.out.println("╔══════════╦══════════════════════════════╦════════════════════╗");
-        System.out.printf("║ %-8s ║ %-28s ║ %-18s ║%n", "ID USER", "NAMA LENGKAP", "ROLE");
-        System.out.println("╠══════════╬══════════════════════════════╬════════════════════╣");
-        
-        boolean adaData = false;
-        while (listRs != null && listRs.next()) {
-            adaData = true;
-            String roleName = (listRs.getInt("id_role") == 1) ? "Guru" : "Siswa";
-            System.out.printf("║ %-8d ║ %-28s ║ %-18s ║%n",
-                    listRs.getInt("id_user"),
-                    listRs.getString("nama"),
-                    roleName);
-        }
-        if (!adaData) {
-            System.out.printf("║ %-59s ║%n", "Data user tidak ditemukan.");
-        }
-        System.out.println("╚══════════╩══════════════════════════════╩════════════════════╝");
-    } catch (SQLException e) {
-        System.out.println(">> Gagal memuat daftar user: " + e.getMessage());
     }
 
-    // 2. Proses Input ID
-    System.out.print("\n➤ Masukkan ID User yang akan dihapus : ");
-    int id_user = input.nextInt();
-    input.nextLine(); // Membersihkan buffer enter
-
-    // 3. Konfirmasi Penghapusan (Sangat Penting untuk Delete)
-    System.out.println("\n PERINGATAN: Menghapus user juga dapat berdampak pada data biodatanya.");
-    System.out.print("➤ Apakah Anda yakin ingin menghapus user ID [" + id_user + "]? (y/n): ");
-    String konfirmasi = input.nextLine();
-
-    if (konfirmasi.equalsIgnoreCase("y")) {
-        // 4. Eksekusi ke Model
-        boolean isDeleteUser = this.usersModel.DeleteUser(id_user);
-
-        // 5. Tampilkan Status Berhasil/Gagal
+    public void DeleteUser() {
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-        if (!isDeleteUser) {
-            System.out.println("║ FAILED : Gagal menghapus user. Pastikan ID User sudah benar. ║");
-        } else {
-            System.out.println("║ SUCCESS: User tersebut telah berhasil dihapus dari sistem.   ║");
-        }
+        System.out.println("║                       DELETE USER                            ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
-    } else {
-        System.out.println(">> Penghapusan user dibatalkan.");
+
+        // 1. Tampilkan Daftar User agar Admin tidak salah hapus ID
+        try {
+            ResultSet listRs = this.usersModel.User();
+            System.out.println("╔══════════╦══════════════════════════════╦════════════════════╗");
+            System.out.printf("║ %-8s ║ %-28s ║ %-18s ║%n", "ID USER", "NAMA LENGKAP", "ROLE");
+            System.out.println("╠══════════╬══════════════════════════════╬════════════════════╣");
+
+            boolean adaData = false;
+            while (listRs != null && listRs.next()) {
+
+                int iduserDb = listRs.getInt("id_user");
+                int idroleDb = listRs.getInt("id_role");
+
+                if (iduserDb == HomeController.session_id_user) {
+                    continue;
+                }
+
+                adaData = true;
+                String roleName = (idroleDb == 1) ? "Guru" : "Siswa";
+                System.out.printf("║ %-8d ║ %-28s ║ %-18s ║%n",
+                        iduserDb,
+                        listRs.getString("nama"),
+                        roleName);
+            }
+            if (!adaData) {
+                System.out.printf("║ %-59s ║%n", "Data user tidak ditemukan.");
+            }
+            System.out.println("╚══════════╩══════════════════════════════╩════════════════════╝");
+        } catch (SQLException e) {
+            System.out.println(">> Gagal memuat daftar user: " + e.getMessage());
+        }
+
+        Users.userdata dto = new Users.userdata();
+
+        // 2. Proses Input ID
+        System.out.print("\n➤ Masukkan ID User yang akan dihapus : ");
+        int id_user = input.nextInt();
+        input.nextLine(); // Membersihkan buffer enter
+        dto.setId_user(id_user);
+
+        if (id_user == HomeController.session_id_user) {
+            System.out.println(">> GAGAL: Anda tidak diperbolehkan mengupdate akun Anda sendiri!");
+            return;
+        }
+
+        // 3. Konfirmasi Penghapusan (Sangat Penting untuk Delete)
+        System.out.println("\n PERINGATAN: Menghapus user juga dapat berdampak pada data biodatanya.");
+        System.out.print("➤ Apakah Anda yakin ingin menghapus user ID [" + id_user + "]? (y/n): ");
+        String konfirmasi = input.nextLine();
+
+        if (konfirmasi.equalsIgnoreCase("y")) {
+            // 4. Eksekusi ke Model
+            boolean isDeleteUser = this.usersModel.DeleteUser(dto);
+
+            // 5. Tampilkan Status Berhasil/Gagal
+            System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
+            if (!isDeleteUser) {
+                System.out.println("║ FAILED : Gagal menghapus user. Pastikan ID User sudah benar. ║");
+            } else {
+                System.out.println("║ SUCCESS: User tersebut telah berhasil dihapus dari sistem.   ║");
+            }
+            System.out.println("╚══════════════════════════════════════════════════════════════╝");
+        } else {
+            System.out.println(">> Penghapusan user dibatalkan.");
+        }
     }
-}
 }

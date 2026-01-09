@@ -28,14 +28,19 @@ public class HomeController extends Controller {
         Users usersModel = new Users();
 
         while (true) {
+            Users.userdata dto = new Users.userdata();
             System.out.println("\n=== Selamat Datang Di Sistem Informasi Akademik ===");
             System.out.print("Username : ");
             String isName = input.nextLine();
+            dto.setNama(isName);
+
             System.out.print("Password : ");
             String isPass = input.nextLine();
+            dto.setPass(isPass);
 
-            try {
-                ResultSet rs = usersModel.ValidasiSiswa(isName, isPass);
+                try {
+
+                ResultSet rs = usersModel.ValidasiSiswa(dto);
 
                 if (rs.next()) {
                     HomeController.session_id_user = rs.getInt("id_user");

@@ -27,10 +27,9 @@ public class GuruController extends HomeController {
     @Override
     public void indexCLI() {
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    INPUT DATA NILAI SISWA                    ║");
+        System.out.println("║                    INPUT NILAI SISWA                         ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
-        System.out.println("\n[ Daftar User Siswa Tersedia ]");
         try {
             ResultSet listRs = this.usersModel.User();
             // Bingkai Tabel Daftar User sesuai request
@@ -77,10 +76,10 @@ public class GuruController extends HomeController {
 
                 dto.setNama(rsUser.getString("nama"));
                 System.out.println("  Nama Siswa    : " + dto.getNama());
-
+                
                 System.out.print("➤ Mata Pelajaran: ");
                 dto.setMapel(input.nextLine());
-
+                
                 System.out.print("➤ Nilai (0-100) : ");
                 dto.setNilai(input.nextDouble());
                 input.nextLine();
@@ -117,7 +116,7 @@ public class GuruController extends HomeController {
 
     public void UpdateNilai() {
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    UPDATE DATA NILAI SISWA                   ║");
+        System.out.println("║                    UPDATE NILAI SISWA                        ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
         // 1. Tampilkan daftar nilai yang tersedia sebagai referensi
@@ -202,7 +201,7 @@ public class GuruController extends HomeController {
     public void DeleteNilai() {
 
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    DELETE DATA NILAI SISWA                   ║");
+        System.out.println("║                    DELETE NILAI SISWA                        ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
         ResultSet listRs = this.nilaiModel.Nilai();
@@ -244,10 +243,9 @@ public class GuruController extends HomeController {
 
     public void InputAbsensi() {
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    INPUT ABSENSI DATA SISWA                  ║");
+        System.out.println("║                    INPUT ABSENSI SISWA                       ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
-        System.out.println("\n[ Daftar User Siswa Tersedia ]");
         try {
             ResultSet listRs = this.usersModel.User();
             // Bingkai Tabel Daftar User
@@ -402,7 +400,7 @@ public class GuruController extends HomeController {
 
     public void DeleteAbsensi() {
         System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    DELETE DATA ABSENSI SISWA                 ║");
+        System.out.println("║                    DELETE ABSENSI SISWA                      ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
         // 1. Tampilkan daftar absensi sebagai referensi agar tidak salah ID
@@ -526,8 +524,7 @@ public class GuruController extends HomeController {
         System.out.println("║                CARI DATA NILAI SISWA (BY ID)                 ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
 
-        // 1. Tampilkan referensi ID Nilai yang tersedia
-        System.out.println("\n[ Daftar Referensi ID Nilai ]");
+        // 1. Tampilkan referensi ID Nilai yang tersedia (Tabel Referensi)
         try {
             ResultSet listRs = this.nilaiModel.Nilai();
             System.out.println("╔════════════╦════════════╦════════════════════════════════╗");
@@ -550,33 +547,49 @@ public class GuruController extends HomeController {
             System.out.println(">> Gagal memuat daftar: " + e.getMessage());
         }
 
-        // 2. Proses Pencarian
+        // 2. Input ID Pencarian
         System.out.print("\n➤ Masukkan ID Nilai yang dicari: ");
         int id = input.nextInt();
-        input.nextLine(); // Consume newline
+        input.nextLine(); // Membersihkan buffer
 
         ResultSet rs = this.nilaiModel.NilaiById(id);
 
         try {
             if (rs != null && rs.next()) {
-                // Tampilan Hasil Pencarian dalam bentuk Kartu Data
-                System.out.println("\n--- HASIL PENCARIAN DATA ---");
-                System.out.println("╔══════════════════════════════════════════════════════╗");
-                System.out.printf("║ %-20s : %-30s ║%n", "ID NILAI", rs.getInt("id_nilai"));
-                System.out.printf("║ %-20s : %-30s ║%n", "ID USER", rs.getInt("id_user"));
-                System.out.printf("║ %-20s : %-30s ║%n", "NAMA SISWA", rs.getString("nama"));
-                System.out.printf("║ %-20s : %-30s ║%n", "MATA PELAJARAN", rs.getString("mapel"));
-                System.out.printf("║ %-20s : %-30.2f ║%n", "NILAI AKHIR", rs.getDouble("nilai"));
-                System.out.println("╚══════════════════════════════════════════════════════╝");
+                // --- BAGIAN HASIL PENCARIAN (SATU BINGKAI UTUH) ---
+                System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+                System.out.println("║                     HASIL PENCARIAN NILAI                        ║");
+                System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+
+                // Informasi Identitas
+                System.out.printf("║ ID NILAI   : %-51d ║%n", rs.getInt("id_nilai"));
+                System.out.printf("║ NAMA SISWA : %-51s ║%n", rs.getString("nama").toUpperCase());
+                System.out.printf("║ ID USER    : %-51d ║%n", rs.getInt("id_user"));
+
+                // Garis Pemisah Tengah (Double Side Connector)
+                System.out.println("╟──────────────────────────────────┬───────────────────────────────╢");
+
+                // Header Kolom Mata Pelajaran
+                System.out.printf("║ %-32s │ %-29s ║%n", "MATA PELAJARAN", "NILAI AKHIR");
+                System.out.println("╟──────────────────────────────────┼───────────────────────────────╢");
+
+                // Isi Data Nilai
+                System.out.printf("║ %-32s │ %-29.2f ║%n",
+                        rs.getString("mapel"),
+                        rs.getDouble("nilai"));
+
+                // Penutup Bingkai Bawah
+                System.out.println("╚══════════════════════════════════╧═══════════════════════════════╝");
 
                 rs.getStatement().close();
             } else {
-                System.out.println("\n╔══════════════════════════════════════════════════════╗");
-                System.out.println("║      GAGAL: Data Nilai ID [" + id + "] Tidak Ditemukan!      ║");
-                System.out.println("╚══════════════════════════════════════════════════════╝");
+                // Pesan Jika Tidak Ditemukan (Juga menggunakan bingkai agar seragam)
+                System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+                System.out.printf("║ GAGAL: Data Nilai ID [%-3d] tidak ditemukan di database!      ║%n", id);
+                System.out.println("╚══════════════════════════════════════════════════════════════════╝");
             }
         } catch (SQLException e) {
-            System.err.println("Error saat menampilkan data: " + e.getMessage());
+            System.err.println(">> Error saat menampilkan data: " + e.getMessage());
         }
     }
 }

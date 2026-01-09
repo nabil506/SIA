@@ -104,49 +104,50 @@ public class SiswaController extends HomeController {
         }
     }
 
-public void AbsensiSiswa() {
-    // 1. Ambil ID dari session login
-    int id_login = HomeController.session_id_user;
-    ResultSet rs = this.absensiModel.AbsenSiswaSelf(id_login);
+    public void AbsensiSiswa() {
+        // 1. Ambil ID dari session login
+        int id_login = HomeController.session_id_user;
+        ResultSet rs = this.absensiModel.AbsenSiswaSelf(id_login);
 
-    // Header Menu
-    System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
-    System.out.println("║                    REKAP ABSENSI KEHADIRAN SISWA                 ║");
-    System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+        // Header Menu
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    REKAP ABSENSI KEHADIRAN SISWA                 ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
 
-    try {
-        // 2. Cek apakah datanya ada
-        if (rs != null && rs.next()) {
-            // Bingkai Tabel Mulai
-            System.out.println("┌──────────────────────────────────────────────────────────────────┐");
-            // Baris Nama dan ID dimasukkan ke dalam tabel
-            System.out.printf("│ NAMA SISWA : %-51s │%n", rs.getString("nama").toUpperCase());
-            System.out.printf("│ ID SISWA   : %-51d │%n", rs.getInt("id_user"));
-            System.out.println("├──────────────────────────────────┬───────────────────────────────┤");
+        try {
+            // 2. Cek apakah datanya ada
+            if (rs != null && rs.next()) {
+                // Bingkai Tabel Mulai
+                System.out.println("┌──────────────────────────────────────────────────────────────────┐");
+                // Baris Nama dan ID dimasukkan ke dalam tabel
+                System.out.printf("│ NAMA SISWA : %-51s │%n", rs.getString("nama").toUpperCase());
+                System.out.printf("│ ID SISWA   : %-51d │%n", rs.getInt("id_user"));
+                System.out.println("├──────────────────────────────────┬───────────────────────────────┤");
 
-            // Header Kolom
-            System.out.printf("│ %-32s │ %-29s │%n", "TANGGAL KEHADIRAN", "STATUS");
-            System.out.println("├──────────────────────────────────┼───────────────────────────────┤");
+                // Header Kolom
+                System.out.printf("│ %-32s │ %-29s │%n", "TANGGAL KEHADIRAN", "STATUS");
+                System.out.println("├──────────────────────────────────┼───────────────────────────────┤");
 
-            // 3. Looping Data (Menggunakan do-while agar data pertama tidak terlewat)
-            do {
-                String status = rs.getString("status").toUpperCase();
-                System.out.printf("│ %-32s │ %-29s │%n",
-                        rs.getString("tanggal"),
-                        status);
-            } while (rs.next());
+                // 3. Looping Data (Menggunakan do-while agar data pertama tidak terlewat)
+                do {
+                    String status = rs.getString("status").toUpperCase();
+                    System.out.printf("│ %-32s │ %-29s │%n",
+                            rs.getString("tanggal"),
+                            status);
+                } while (rs.next());
 
-            System.out.println("└──────────────────────────────────┴───────────────────────────────┘");
+                System.out.println("└──────────────────────────────────┴───────────────────────────────┘");
 
-            // Menutup result set
-            rs.getStatement().close();
-        } else {
-            // Jika data absensi belum ada
-            System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
-            System.out.println("║ INFO: Belum ada data absensi yang tercatat untuk Anda.           ║");
-            System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+                // Menutup result set
+                rs.getStatement().close();
+            } else {
+                // Jika data absensi belum ada
+                System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+                System.out.println("║ INFO: Belum ada data absensi yang tercatat untuk Anda.           ║");
+                System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+            }
+        } catch (SQLException e) {
+            System.out.println(">> Error Absensi: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        System.out.println(">> Error Absensi: " + e.getMessage());
     }
-}}
+}

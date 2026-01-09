@@ -65,22 +65,22 @@ public class Nilai extends Database {
 
         try {
             // 2. Query untuk mengecek apakah ID User tersebut adalah Siswa (id_role = 2)
-            String checkRoleSql = "SELECT id_role FROM users WHERE id_user = ?";
-            var checkStmt = prepare(checkRoleSql);
-            checkStmt.setInt(1, dto.getId_user());
-            ResultSet rs = checkStmt.executeQuery();
+            // String checkRoleSql = "SELECT id_role FROM users WHERE id_user = ?";
+            // var checkStmt = prepare(checkRoleSql);
+            // checkStmt.setInt(1, dto.getId_user());
+            // ResultSet rs = checkStmt.executeQuery();
 
-            if (rs.next()) {
-                int role = rs.getInt("id_role");
+            // if (rs.next()) {
+            //     int role = rs.getInt("id_role");
 
-                if (role != 2) {
-                    System.out.println(">> Gagal: User tersebut bukan siswa!");
-                    return false;
-                }
-            } else {
-                System.out.println(">> Gagal: ID User tidak ditemukan!");
-                return false;
-            }
+            //     if (role != 2) {
+            //         System.out.println(">> Gagal: User tersebut bukan siswa!");
+            //         return false;
+            //     }
+            // } else {
+            //     System.out.println(">> Gagal: ID User tidak ditemukan!");
+            //     return false;
+            // }
 
             // 4. Jika validasi lolos, lakukan INSERT (Tanpa klausa WHERE)
             String sql = "INSERT INTO nilai (id_user,nama, mapel, nilai) VALUES (?, ?, ?, ?)";
